@@ -12,6 +12,7 @@
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
 #import <Firebase.h>
+@import GoogleMaps;
 
 @implementation AppDelegate
 
@@ -29,6 +30,7 @@
 
   self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
   UIViewController *rootViewController = [UIViewController new];
+  [GMSServices provideAPIKey:@"AIzaSyCk-rIOGOwrw6MQh7rzStStaACzXev37tc"];
   rootViewController.view = rootView;
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
