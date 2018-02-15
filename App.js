@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
+import { Container, Button, Text } from 'native-base';
 
 const styles = StyleSheet.create({
   container: {
@@ -38,6 +39,11 @@ export default class MyApp extends Component {
             onPress={() => alert(1)}
           />
         </MapView>
+        <Button>
+          <Text>
+            Button
+          </Text>
+        </Button>
       </View>
     );
   }
