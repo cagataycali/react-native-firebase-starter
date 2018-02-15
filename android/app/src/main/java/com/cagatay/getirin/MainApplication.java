@@ -1,4 +1,4 @@
-package com.invertase.rnfirebasestarter;
+package com.cagatay.getirin;
 
 import android.app.Application;
 
