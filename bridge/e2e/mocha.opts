@@ -1,0 +1,7 @@
+--recursive
+--timeout 120000
+--slow 600
+--bail
+--exit
+--require bridge/platform/node
+--require ./helpers

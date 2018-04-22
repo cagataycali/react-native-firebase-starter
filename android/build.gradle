@@ -1,31 +1,108 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
-
 buildscript {
-    repositories {
-        jcenter()
-        maven {
-            url 'https://maven.fabric.io/public'
-        }
+  repositories {
+    jcenter()
+    google()
+    maven {
+      url 'https://maven.fabric.io/public'
     }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.3'
-        classpath 'com.google.gms:google-services:3.1.2'
-        classpath 'io.fabric.tools:gradle:1.24.4'
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
-    }
+  }
+  dependencies {
+    classpath 'com.android.tools.build:gradle:3.1.0'
+    classpath 'io.fabric.tools:gradle:1.25.1'
+  }
 }
 
-allprojects {
-    repositories {
-        mavenLocal()
-        jcenter()
-        maven {
-            // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
-            url "$rootDir/../node_modules/react-native/android"
-        }
-        maven {
-            url 'https://maven.google.com'
-        }
+apply plugin: 'com.android.library'
+
+def DEFAULT_COMPILE_SDK_VERSION = 27
+def DEFAULT_BUILD_TOOLS_VERSION = "27.0.3"
+def DEFAULT_TARGET_SDK_VERSION = 26
+def DEFAULT_FIREBASE_VERSION = "12.0.0"
+def DEFAULT_SUPPORT_LIB_VERSION = "27.0.2"
+
+android {
+  compileSdkVersion rootProject.hasProperty('compileSdkVersion') ? rootProject.compileSdkVersion : DEFAULT_COMPILE_SDK_VERSION
+  buildToolsVersion rootProject.hasProperty('buildToolsVersion') ? rootProject.buildToolsVersion : DEFAULT_BUILD_TOOLS_VERSION
+  defaultConfig {
+    minSdkVersion 16
+    targetSdkVersion rootProject.hasProperty('targetSdkVersion') ? rootProject.targetSdkVersion : DEFAULT_TARGET_SDK_VERSION
+    versionCode 1
+    versionName "1.0"
+    multiDexEnabled true
+  }
+  buildTypes {
+    release {
+      minifyEnabled false
     }
+  }
+  productFlavors {
+  }
+}
+
+
+allprojects {
+  repositories {
+    jcenter()
+    mavenLocal()
+    google()
+  }
+}
+
+rootProject.gradle.buildFinished { buildResult ->
+  if (buildResult.getFailure() != null) {
+    try {
+      String message = buildResult.getFailure().properties.get("reportableCauses").toString()
+      if (message.contains("com.android.dex.DexException: Multiple dex files define Lcom/google/") ||
+        message.contains("java.util.zip.ZipException: duplicate entry: com/google/android/gms/")) {
+        logger.log(LogLevel.ERROR, "")
+        logger.log(LogLevel.ERROR, " -----------------------------------------------------------")
+        logger.log(LogLevel.ERROR, "|                    REACT NATIVE FIREBASE                  |")
+        logger.log(LogLevel.ERROR, " ----------------------------------------------------------- ")
+        logger.log(LogLevel.ERROR, "|                                                           |")
+        logger.log(LogLevel.ERROR, "|  This is a common build error when using libraries that   |")
+        logger.log(LogLevel.ERROR, "|  require google play services.                            |")
+        logger.log(LogLevel.ERROR, "|                                                           |")
+        logger.log(LogLevel.ERROR, "|  This error occurs because different versions of google   |")
+        logger.log(LogLevel.ERROR, "|  play services or google play services modules are being  |")
+        logger.log(LogLevel.ERROR, "|  required by different libraries.                         |")
+        logger.log(LogLevel.ERROR, "|                                                           |")
+        logger.log(LogLevel.ERROR, "|  A temporary fix would be to set:                         |")
+        logger.log(LogLevel.ERROR, "|                                                           |")
+        logger.log(LogLevel.ERROR, "|             android { multiDexEnabled true }              |")
+        logger.log(LogLevel.ERROR, "|                                                           |")
+        logger.log(LogLevel.ERROR, "|  inside your build gradle, however it is recommended for  |")
+        logger.log(LogLevel.ERROR, "|  your prod build that you de-duplicate these to minimize  |")
+        logger.log(LogLevel.ERROR, "|  bundle size.                                             |")
+        logger.log(LogLevel.ERROR, "|                                                           |")
+        logger.log(LogLevel.ERROR, "|  See http://invertase.link/dupe-dex for how to do this.   |")
+        logger.log(LogLevel.ERROR, "|                                                           |")
+        logger.log(LogLevel.ERROR, " ----------------------------------------------------------- ")
+      }
+    } catch (Exception exception) {}
+  }
+}
+
+def firebaseVersion = rootProject.hasProperty('googlePlayServicesVersion') ? rootProject.googlePlayServicesVersion : DEFAULT_FIREBASE_VERSION
+def supportVersion = rootProject.hasProperty('supportLibVersion') ? rootProject.supportLibVersion : DEFAULT_SUPPORT_LIB_VERSION
+
+dependencies {
+  // compile fileTree(include: ['*.jar'], dir: 'libs')
+  api "com.facebook.react:react-native:+"  // From node_modules
+  api "com.android.support:support-v4:$supportVersion"
+  compileOnly 'me.leolin:ShortcutBadger:1.1.21@aar'
+  compileOnly "com.google.android.gms:play-services-base:$firebaseVersion"
+  compileOnly "com.google.firebase:firebase-core:$firebaseVersion"
+  compileOnly "com.google.firebase:firebase-config:$firebaseVersion"
+  compileOnly "com.google.firebase:firebase-auth:$firebaseVersion"
+  compileOnly "com.google.firebase:firebase-database:$firebaseVersion"
+  compileOnly "com.google.firebase:firebase-storage:$firebaseVersion"
+  compileOnly "com.google.firebase:firebase-messaging:$firebaseVersion"
+  compileOnly "com.google.firebase:firebase-crash:$firebaseVersion"
+  compileOnly "com.google.firebase:firebase-perf:$firebaseVersion"
+  compileOnly "com.google.firebase:firebase-ads:$firebaseVersion"
+  compileOnly "com.google.firebase:firebase-firestore:$firebaseVersion"
+  compileOnly "com.google.firebase:firebase-invites:$firebaseVersion"
+  compileOnly('com.crashlytics.sdk.android:crashlytics:2.9.1@aar') {
+    transitive = true
+  }
 }
